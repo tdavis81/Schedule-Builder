@@ -1,0 +1,46 @@
+﻿<style>
+    h1,h2,h3,h4,h5,h6 {
+        color: white;
+    }
+    .swal2-overflow {
+        overflow-x: visible;
+        overflow-y: visible;
+    }
+
+</style>
+@{
+    ViewBag.Title = "Employee Trades";
+}
+
+<h2>Employee Trades</h2>
+<br />
+@using (Html.BeginForm("SaveEmployeeTrade", "Home"))
+{
+    <div class="form-group" style="background-color: white; padding: 25px;border-radius: 6px">
+        <input type="hidden" name="ID" value="@ViewBag.EmployeeTrade.ID"/>
+        <div class="row">
+            <div class="col-md-4">
+                <label for="ShiftTime">Shift Time</label>
+                @Html.DropDownList("EventID", new SelectList(ViewBag.EmployeeShifts, "ID", "ThemeColor", ViewBag.EmployeeTrade.EventID), new { @class = "form-control",required="required" })
+            </div>
+            <div class="col-md-4">
+                <label for="Position">Position</label>
+                <input id="Position" type="text" value="@ViewBag.EmployeeTrade.Position" name="Position" class="form-control"  required/>
+            </div>
+        </div>
+        <br />
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+
+}
+
+
+@section scripts
+{
+    <script>
+
+        
+
+    </script>
+}

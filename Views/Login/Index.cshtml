@@ -1,0 +1,93 @@
+﻿<link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+<style>
+
+    h1, h2, h3, h4, h5, h6 {
+        color: white;
+        font-family: 'Lobster', cursive;
+    }
+
+    .loginContainer {
+        background-color: white;
+        border-radius: 5px;
+        height: 650px;
+    }
+
+    input[type=text], select {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+</style>
+
+@{
+    ViewBag.Title = "Login";
+}
+
+
+<div class="row">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-8 loginContainer">
+        @using (Html.BeginForm("AttemptLogin", "Login", FormMethod.Post))
+        {
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-8" align="center" style="margin-top:5%">
+
+                    <h2 style="color:black">Schedule Builder Login</h2>
+                    <hr style="margin-bottom:20%" />
+
+                    <!--Email Input-->
+                    <div class="form-group">
+                        <div class="input-group input-group-lg" style="margin-left:14%">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                            </div>
+                            <input id="Email" name="Email" type="email" class="form-control" placeholder="Email" required>
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <!--Password Input-->
+                    <div class="form-group">
+                        <div class="input-group input-group-lg" style="margin-left:14%">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                            </div>
+                            <input id="Password" name="Password" type="password" class="form-control" placeholder="Password" required>
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <!--Submit/Login Button-->
+                    <button style="width:71%" type="submit" class="btn btn-success"><i class="fas fa-sign-in-alt"></i> Login</button>
+                    
+                    <br/>
+                    
+
+                    @if (ViewBag.error != "")
+                    {
+                        <div style="padding-top: .35rem">
+                            <div id="invalidC" class="form-control-feedback">
+                                <span class="text-danger align-middle">
+                                    <i class="fa fa-times"></i> <span style="font-weight:600">@ViewBag.error</span>
+                                </span>
+                            </div>
+                        </div>
+                    }
+
+
+                </div>
+                <div class="col-md-2"></div>
+            </div>
+        }
+    </div>
+    <div class="col-lg-2"></div>
+
+</div>

@@ -1,0 +1,606 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ScheduleBuilderModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AcceptCode">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="Status" Type="nchar" MaxLength="10" Nullable="false" />
+          <Property Name="Color" Type="nchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ApprovedCode">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="25" Nullable="false" />
+          <Property Name="Color" Type="nvarchar" MaxLength="25" Nullable="false" />
+        </EntityType>
+        <EntityType Name="EmployeeEvent">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ShiftStartTime" Type="datetime" Nullable="false" />
+          <Property Name="ShiftEndTime" Type="datetime" Nullable="false" />
+          <Property Name="ShiftHours" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ThemeColor" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="EmployeeID" Type="int" Nullable="false" />
+          <Property Name="ScheduleID" Type="int" Nullable="false" />
+          <Property Name="ApprovedStatusID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="EmployeeTrade">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Position" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="EventID" Type="int" Nullable="false" />
+          <Property Name="AcceptStatusID" Type="int" Nullable="false" />
+          <Property Name="ApprovedStatusID" Type="int" Nullable="false" />
+          <Property Name="UserID" Type="int" Nullable="false" />
+          <Property Name="SwapUserID" Type="int" />
+        </EntityType>
+        <EntityType Name="Schedule">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="WeekOf" Type="date" Nullable="false" />
+          <Property Name="TotalHours" Type="decimal" Precision="15" Scale="2" Nullable="false" />
+          <Property Name="ApprovedStatusID" Type="int" Nullable="false" />
+          <Property Name="StoreNumber" Type="nvarchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="75" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="75" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="75" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="PhoneNumber" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="EmployeeNumber" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="IsPasswordResetNeeded" Type="bit" Nullable="false" />
+          <Property Name="PasswordFailures" Type="int" Nullable="false" />
+          <Property Name="IsEnabled" Type="bit" Nullable="false" />
+          <Property Name="IsFullTime" Type="bit" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="HireDate" Type="datetime" Nullable="false" />
+          <Property Name="PTO" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="UserRoleID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UserRole">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="Type" Type="nchar" MaxLength="10" Nullable="false" />
+        </EntityType>
+        <Association Name="EmployeeTrade_To_AcceptStatus">
+          <End Role="AcceptCode" Type="Self.AcceptCode" Multiplicity="1" />
+          <End Role="EmployeeTrade" Type="Self.EmployeeTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AcceptCode">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeTrade">
+              <PropertyRef Name="AcceptStatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="EmployeeTrade_To_ApprovedStatus">
+          <End Role="ApprovedCode" Type="Self.ApprovedCode" Multiplicity="1" />
+          <End Role="EmployeeTrade" Type="Self.EmployeeTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ApprovedCode">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeTrade">
+              <PropertyRef Name="ApprovedStatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="EmployeeTrade_To_User">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="EmployeeTrade" Type="Self.EmployeeTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeTrade">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Schedule_Has_ApprovedStatus">
+          <End Role="ApprovedCode" Type="Self.ApprovedCode" Multiplicity="1" />
+          <End Role="EmployeeEvent" Type="Self.EmployeeEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ApprovedCode">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeEvent">
+              <PropertyRef Name="ApprovedStatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Schedule_Has_Employee">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="EmployeeEvent" Type="Self.EmployeeEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeEvent">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Schedule_Has_ScheduleID">
+          <End Role="Schedule" Type="Self.Schedule" Multiplicity="1" />
+          <End Role="EmployeeEvent" Type="Self.EmployeeEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Schedule">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeEvent">
+              <PropertyRef Name="ScheduleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ScheduleApprovedStatus">
+          <End Role="ApprovedCode" Type="Self.ApprovedCode" Multiplicity="1" />
+          <End Role="Schedule" Type="Self.Schedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ApprovedCode">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Schedule">
+              <PropertyRef Name="ApprovedStatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Trade_Has_Event">
+          <End Role="EmployeeEvent" Type="Self.EmployeeEvent" Multiplicity="1" />
+          <End Role="EmployeeTrade" Type="Self.EmployeeTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmployeeEvent">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeTrade">
+              <PropertyRef Name="EventID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_Has_UserRole">
+          <End Role="UserRole" Type="Self.UserRole" Multiplicity="1" />
+          <End Role="User" Type="Self.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserRole">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="UserRoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ScheduleBuilderModelStoreContainer">
+          <EntitySet Name="AcceptCode" EntityType="Self.AcceptCode" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ApprovedCode" EntityType="Self.ApprovedCode" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmployeeEvent" EntityType="Self.EmployeeEvent" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmployeeTrade" EntityType="Self.EmployeeTrade" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Schedule" EntityType="Self.Schedule" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserRole" EntityType="Self.UserRole" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="EmployeeTrade_To_AcceptStatus" Association="Self.EmployeeTrade_To_AcceptStatus">
+            <End Role="AcceptCode" EntitySet="AcceptCode" />
+            <End Role="EmployeeTrade" EntitySet="EmployeeTrade" />
+          </AssociationSet>
+          <AssociationSet Name="EmployeeTrade_To_ApprovedStatus" Association="Self.EmployeeTrade_To_ApprovedStatus">
+            <End Role="ApprovedCode" EntitySet="ApprovedCode" />
+            <End Role="EmployeeTrade" EntitySet="EmployeeTrade" />
+          </AssociationSet>
+          <AssociationSet Name="EmployeeTrade_To_User" Association="Self.EmployeeTrade_To_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="EmployeeTrade" EntitySet="EmployeeTrade" />
+          </AssociationSet>
+          <AssociationSet Name="Schedule_Has_ApprovedStatus" Association="Self.Schedule_Has_ApprovedStatus">
+            <End Role="ApprovedCode" EntitySet="ApprovedCode" />
+            <End Role="EmployeeEvent" EntitySet="EmployeeEvent" />
+          </AssociationSet>
+          <AssociationSet Name="Schedule_Has_Employee" Association="Self.Schedule_Has_Employee">
+            <End Role="User" EntitySet="User" />
+            <End Role="EmployeeEvent" EntitySet="EmployeeEvent" />
+          </AssociationSet>
+          <AssociationSet Name="Schedule_Has_ScheduleID" Association="Self.Schedule_Has_ScheduleID">
+            <End Role="Schedule" EntitySet="Schedule" />
+            <End Role="EmployeeEvent" EntitySet="EmployeeEvent" />
+          </AssociationSet>
+          <AssociationSet Name="ScheduleApprovedStatus" Association="Self.ScheduleApprovedStatus">
+            <End Role="ApprovedCode" EntitySet="ApprovedCode" />
+            <End Role="Schedule" EntitySet="Schedule" />
+          </AssociationSet>
+          <AssociationSet Name="Trade_Has_Event" Association="Self.Trade_Has_Event">
+            <End Role="EmployeeEvent" EntitySet="EmployeeEvent" />
+            <End Role="EmployeeTrade" EntitySet="EmployeeTrade" />
+          </AssociationSet>
+          <AssociationSet Name="User_Has_UserRole" Association="Self.User_Has_UserRole">
+            <End Role="UserRole" EntitySet="UserRole" />
+            <End Role="User" EntitySet="User" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ScheduleBuilderModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ApprovedCode">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="25" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Color" Type="String" MaxLength="25" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Schedules" Relationship="Self.ScheduleApprovedStatus" FromRole="ApprovedCode" ToRole="Schedule" />
+          <NavigationProperty Name="EmployeeEvents" Relationship="ScheduleBuilderModel.Schedule_Has_ApprovedStatus" FromRole="ApprovedCode" ToRole="EmployeeEvent" />
+          <NavigationProperty Name="EmployeeTrades" Relationship="ScheduleBuilderModel.EmployeeTrade_To_ApprovedStatus" FromRole="ApprovedCode" ToRole="EmployeeTrade" />
+        </EntityType>
+        <EntityType Name="Schedule">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="WeekOf" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="TotalHours" Type="Decimal" Precision="15" Scale="2" Nullable="false" />
+          <Property Name="ApprovedStatusID" Type="Int32" Nullable="false" />
+          <Property Name="StoreNumber" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="ApprovedCode" Relationship="Self.ScheduleApprovedStatus" FromRole="Schedule" ToRole="ApprovedCode" />
+          <NavigationProperty Name="EmployeeEvents" Relationship="ScheduleBuilderModel.Schedule_Has_ScheduleID" FromRole="Schedule" ToRole="EmployeeEvent" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FirstName" Type="String" MaxLength="75" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastName" Type="String" MaxLength="75" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Email" Type="String" MaxLength="75" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="12" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="EmployeeNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsPasswordResetNeeded" Type="Boolean" Nullable="false" />
+          <Property Name="PasswordFailures" Type="Int32" Nullable="false" />
+          <Property Name="IsEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="IsFullTime" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="HireDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="PTO" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="UserRoleID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="UserRole" Relationship="Self.User_Has_UserRole" FromRole="User" ToRole="UserRole" />
+          <NavigationProperty Name="EmployeeEvents" Relationship="ScheduleBuilderModel.Schedule_Has_Employee" FromRole="User" ToRole="EmployeeEvent" />
+          <NavigationProperty Name="EmployeeTrades" Relationship="ScheduleBuilderModel.EmployeeTrade_To_User" FromRole="User" ToRole="EmployeeTrade" />
+        </EntityType>
+        <EntityType Name="UserRole">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="String" MaxLength="10" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Users" Relationship="Self.User_Has_UserRole" FromRole="UserRole" ToRole="User" />
+        </EntityType>
+        <Association Name="ScheduleApprovedStatus">
+          <End Role="ApprovedCode" Type="Self.ApprovedCode" Multiplicity="1" />
+          <End Role="Schedule" Type="Self.Schedule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ApprovedCode">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Schedule">
+              <PropertyRef Name="ApprovedStatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="User_Has_UserRole">
+          <End Role="UserRole" Type="Self.UserRole" Multiplicity="1" />
+          <End Role="User" Type="Self.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserRole">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="UserRoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ScheduleBuilderEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ApprovedCodes" EntityType="Self.ApprovedCode" />
+          <EntitySet Name="Schedules" EntityType="Self.Schedule" />
+          <EntitySet Name="Users" EntityType="Self.User" />
+          <EntitySet Name="UserRoles" EntityType="Self.UserRole" />
+          <AssociationSet Name="ScheduleApprovedStatus" Association="Self.ScheduleApprovedStatus">
+            <End Role="ApprovedCode" EntitySet="ApprovedCodes" />
+            <End Role="Schedule" EntitySet="Schedules" />
+          </AssociationSet>
+          <AssociationSet Name="User_Has_UserRole" Association="Self.User_Has_UserRole">
+            <End Role="UserRole" EntitySet="UserRoles" />
+            <End Role="User" EntitySet="Users" />
+          </AssociationSet>
+          <EntitySet Name="EmployeeEvents" EntityType="ScheduleBuilderModel.EmployeeEvent" />
+          <AssociationSet Name="Schedule_Has_ApprovedStatus" Association="ScheduleBuilderModel.Schedule_Has_ApprovedStatus">
+            <End Role="ApprovedCode" EntitySet="ApprovedCodes" />
+            <End Role="EmployeeEvent" EntitySet="EmployeeEvents" />
+          </AssociationSet>
+          <AssociationSet Name="Schedule_Has_Employee" Association="ScheduleBuilderModel.Schedule_Has_Employee">
+            <End Role="User" EntitySet="Users" />
+            <End Role="EmployeeEvent" EntitySet="EmployeeEvents" />
+          </AssociationSet>
+          <AssociationSet Name="Schedule_Has_ScheduleID" Association="ScheduleBuilderModel.Schedule_Has_ScheduleID">
+            <End Role="Schedule" EntitySet="Schedules" />
+            <End Role="EmployeeEvent" EntitySet="EmployeeEvents" />
+          </AssociationSet>
+          <EntitySet Name="AcceptCodes" EntityType="ScheduleBuilderModel.AcceptCode" />
+          <EntitySet Name="EmployeeTrades" EntityType="ScheduleBuilderModel.EmployeeTrade" />
+          <AssociationSet Name="EmployeeTrade_To_AcceptStatus" Association="ScheduleBuilderModel.EmployeeTrade_To_AcceptStatus">
+            <End Role="AcceptCode" EntitySet="AcceptCodes" />
+            <End Role="EmployeeTrade" EntitySet="EmployeeTrades" />
+          </AssociationSet>
+          <AssociationSet Name="EmployeeTrade_To_ApprovedStatus" Association="ScheduleBuilderModel.EmployeeTrade_To_ApprovedStatus">
+            <End Role="ApprovedCode" EntitySet="ApprovedCodes" />
+            <End Role="EmployeeTrade" EntitySet="EmployeeTrades" />
+          </AssociationSet>
+          <AssociationSet Name="Trade_Has_Event" Association="ScheduleBuilderModel.Trade_Has_Event">
+            <End Role="EmployeeEvent" EntitySet="EmployeeEvents" />
+            <End Role="EmployeeTrade" EntitySet="EmployeeTrades" />
+          </AssociationSet>
+          <AssociationSet Name="EmployeeTrade_To_User" Association="ScheduleBuilderModel.EmployeeTrade_To_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="EmployeeTrade" EntitySet="EmployeeTrades" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="EmployeeEvent">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ShiftStartTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ShiftEndTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ShiftHours" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+          <Property Name="ThemeColor" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="EmployeeID" Type="Int32" Nullable="false" />
+          <Property Name="ScheduleID" Type="Int32" Nullable="false" />
+          <Property Name="ApprovedStatusID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ApprovedCode" Relationship="ScheduleBuilderModel.Schedule_Has_ApprovedStatus" FromRole="EmployeeEvent" ToRole="ApprovedCode" />
+          <NavigationProperty Name="User" Relationship="ScheduleBuilderModel.Schedule_Has_Employee" FromRole="EmployeeEvent" ToRole="User" />
+          <NavigationProperty Name="Schedule" Relationship="ScheduleBuilderModel.Schedule_Has_ScheduleID" FromRole="EmployeeEvent" ToRole="Schedule" />
+          <NavigationProperty Name="EmployeeTrades" Relationship="ScheduleBuilderModel.Trade_Has_Event" FromRole="EmployeeEvent" ToRole="EmployeeTrade" />
+        </EntityType>
+        <Association Name="Schedule_Has_ApprovedStatus">
+          <End Type="ScheduleBuilderModel.ApprovedCode" Role="ApprovedCode" Multiplicity="1" />
+          <End Type="ScheduleBuilderModel.EmployeeEvent" Role="EmployeeEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ApprovedCode">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeEvent">
+              <PropertyRef Name="ApprovedStatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Schedule_Has_Employee">
+          <End Type="ScheduleBuilderModel.User" Role="User" Multiplicity="1" />
+          <End Type="ScheduleBuilderModel.EmployeeEvent" Role="EmployeeEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeEvent">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Schedule_Has_ScheduleID">
+          <End Type="ScheduleBuilderModel.Schedule" Role="Schedule" Multiplicity="1" />
+          <End Type="ScheduleBuilderModel.EmployeeEvent" Role="EmployeeEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Schedule">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeEvent">
+              <PropertyRef Name="ScheduleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="AcceptCode">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="true" />
+          <Property Name="Color" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="EmployeeTrades" Relationship="ScheduleBuilderModel.EmployeeTrade_To_AcceptStatus" FromRole="AcceptCode" ToRole="EmployeeTrade" />
+        </EntityType>
+        <EntityType Name="EmployeeTrade">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Position" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="EventID" Type="Int32" Nullable="false" />
+          <Property Name="AcceptStatusID" Type="Int32" Nullable="false" />
+          <Property Name="ApprovedStatusID" Type="Int32" Nullable="false" />
+          <Property Name="UserID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="AcceptCode" Relationship="ScheduleBuilderModel.EmployeeTrade_To_AcceptStatus" FromRole="EmployeeTrade" ToRole="AcceptCode" />
+          <NavigationProperty Name="ApprovedCode" Relationship="ScheduleBuilderModel.EmployeeTrade_To_ApprovedStatus" FromRole="EmployeeTrade" ToRole="ApprovedCode" />
+          <NavigationProperty Name="EmployeeEvent" Relationship="ScheduleBuilderModel.Trade_Has_Event" FromRole="EmployeeTrade" ToRole="EmployeeEvent" />
+          <NavigationProperty Name="User" Relationship="ScheduleBuilderModel.EmployeeTrade_To_User" FromRole="EmployeeTrade" ToRole="User" />
+          <Property Name="SwapUserID" Type="Int32" />
+        </EntityType>
+        <Association Name="EmployeeTrade_To_AcceptStatus">
+          <End Type="ScheduleBuilderModel.AcceptCode" Role="AcceptCode" Multiplicity="1" />
+          <End Type="ScheduleBuilderModel.EmployeeTrade" Role="EmployeeTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AcceptCode">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeTrade">
+              <PropertyRef Name="AcceptStatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="EmployeeTrade_To_ApprovedStatus">
+          <End Type="ScheduleBuilderModel.ApprovedCode" Role="ApprovedCode" Multiplicity="1" />
+          <End Type="ScheduleBuilderModel.EmployeeTrade" Role="EmployeeTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ApprovedCode">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeTrade">
+              <PropertyRef Name="ApprovedStatusID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Trade_Has_Event">
+          <End Type="ScheduleBuilderModel.EmployeeEvent" Role="EmployeeEvent" Multiplicity="1" />
+          <End Type="ScheduleBuilderModel.EmployeeTrade" Role="EmployeeTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmployeeEvent">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeTrade">
+              <PropertyRef Name="EventID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="EmployeeTrade_To_User">
+          <End Type="ScheduleBuilderModel.User" Role="User" Multiplicity="1" />
+          <End Type="ScheduleBuilderModel.EmployeeTrade" Role="EmployeeTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="EmployeeTrade">
+              <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ScheduleBuilderModelStoreContainer" CdmEntityContainer="ScheduleBuilderEntities">
+          <EntitySetMapping Name="ApprovedCodes">
+            <EntityTypeMapping TypeName="ScheduleBuilderModel.ApprovedCode">
+              <MappingFragment StoreEntitySet="ApprovedCode">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Color" ColumnName="Color" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Schedules">
+            <EntityTypeMapping TypeName="ScheduleBuilderModel.Schedule">
+              <MappingFragment StoreEntitySet="Schedule">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="WeekOf" ColumnName="WeekOf" />
+                <ScalarProperty Name="TotalHours" ColumnName="TotalHours" />
+                <ScalarProperty Name="ApprovedStatusID" ColumnName="ApprovedStatusID" />
+                <ScalarProperty Name="StoreNumber" ColumnName="StoreNumber" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="ScheduleBuilderModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="EmployeeNumber" ColumnName="EmployeeNumber" />
+                <ScalarProperty Name="IsPasswordResetNeeded" ColumnName="IsPasswordResetNeeded" />
+                <ScalarProperty Name="PasswordFailures" ColumnName="PasswordFailures" />
+                <ScalarProperty Name="IsEnabled" ColumnName="IsEnabled" />
+                <ScalarProperty Name="IsFullTime" ColumnName="IsFullTime" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="HireDate" ColumnName="HireDate" />
+                <ScalarProperty Name="PTO" ColumnName="PTO" />
+                <ScalarProperty Name="UserRoleID" ColumnName="UserRoleID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserRoles">
+            <EntityTypeMapping TypeName="ScheduleBuilderModel.UserRole">
+              <MappingFragment StoreEntitySet="UserRole">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmployeeEvents">
+            <EntityTypeMapping TypeName="ScheduleBuilderModel.EmployeeEvent">
+              <MappingFragment StoreEntitySet="EmployeeEvent">
+                <ScalarProperty Name="ApprovedStatusID" ColumnName="ApprovedStatusID" />
+                <ScalarProperty Name="ScheduleID" ColumnName="ScheduleID" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="ThemeColor" ColumnName="ThemeColor" />
+                <ScalarProperty Name="ShiftHours" ColumnName="ShiftHours" />
+                <ScalarProperty Name="ShiftEndTime" ColumnName="ShiftEndTime" />
+                <ScalarProperty Name="ShiftStartTime" ColumnName="ShiftStartTime" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AcceptCodes">
+            <EntityTypeMapping TypeName="ScheduleBuilderModel.AcceptCode">
+              <MappingFragment StoreEntitySet="AcceptCode">
+                <ScalarProperty Name="Color" ColumnName="Color" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmployeeTrades">
+            <EntityTypeMapping TypeName="ScheduleBuilderModel.EmployeeTrade">
+              <MappingFragment StoreEntitySet="EmployeeTrade">
+                <ScalarProperty Name="SwapUserID" ColumnName="SwapUserID" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+                <ScalarProperty Name="ApprovedStatusID" ColumnName="ApprovedStatusID" />
+                <ScalarProperty Name="AcceptStatusID" ColumnName="AcceptStatusID" />
+                <ScalarProperty Name="EventID" ColumnName="EventID" />
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

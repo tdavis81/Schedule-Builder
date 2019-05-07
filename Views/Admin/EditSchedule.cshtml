@@ -1,0 +1,481 @@
+﻿@using ScheduleBuilderApp.Controllers
+<style>
+    h1, h2, h3, h4, h5, h6, label {
+        color: white
+    }
+
+    #ui-datepicker-div {
+        background: white none;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 60%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+</style>
+@{
+    ViewBag.Title = "Edit Schedule";
+}
+
+<div class="row" style="margin-top: 15px;margin-bottom: 15px">
+    <div class="col-md-8">
+        <h2 style="margin: 15px 0">Edit Schedule</h2>
+        <h4 style="margin: 15px 0">Status - [ <span style="color:@ViewBag.Schedule.ApprovedCode.Color">@ViewBag.Schedule.ApprovedCode.Status</span> ]</h4>
+    </div>
+    <div class="col-md-2" style="float:right">
+        <h5>Store Number</h5>
+        @if (ViewBag.Schedule.ApprovedCode.Status == "PENDING")
+        {
+            <input id="storeNumber" value="@ViewBag.Schedule.StoreNumber" class="form-control" style="float:right" type="text" />
+        }
+        else
+        {
+            <input id="storeNumber" value="@ViewBag.Schedule.StoreNumber" readonly class="form-control" style="float:right" type="text" />
+        }
+    </div>
+    <div class="col-md-2" style="float:right">
+        <h5>Week Of</h5>
+        <input id="datepicker" value="@ViewBag.Schedule.WeekOf.ToString("MM/dd/yyyy")" readonly class="form-control" type="text">
+    </div>
+
+</div>
+
+<table id="SupplyTable" class="table table-striped table-dark">
+    <thead>
+        <tr style="text-align:center">
+            <th>Employee Name</th>
+            @foreach (var day in ViewBag.Days)
+            {
+                <th>@day.Date.DayOfWeek <br /> @day.Date.ToString("MM/dd")</th>
+            }
+            <th>Total Hours</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var empCounter = 0;
+            var inputCounter = 0;
+            var isSet = false;
+            decimal totalEmpHours = 0;
+            decimal totalOverallHours = 0;
+        }
+        @foreach (var employee in ViewBag.Employees)
+        {
+            <tr>
+                <td style="text-align: center" id="employeeName-@empCounter">@employee.FirstName @employee.LastName</td>
+                <td style="display: none" id="employeeId-@empCounter">@employee.ID</td>
+                @foreach (var day in ViewBag.Days)
+                {
+                    foreach (var empEvent in ViewBag.EmployeeEvents)
+                    {
+                        if (empEvent.EmployeeID == employee.ID)
+                        {
+                            if (day.Date == empEvent.ShiftStartTime.Date)
+                            {
+                                <td><input id="daysInputs-@inputCounter" class="inputsClass form-control" value="@empEvent.ShiftStartTime.ToString("h:mm tt")-@empEvent.ShiftEndTime.ToString("h:mm tt")" data-StartTime="@empEvent.ShiftStartTime" data-EndTime="@empEvent.ShiftEndTime" data-TotalHours="@empEvent.ShiftHours" data-fulldate="@day.Date.ToString("MM/dd/yyyy")" style="width: 95%;" type="text" readonly/></td>
+                                isSet = true;
+                                totalEmpHours += empEvent.ShiftHours;
+                                totalOverallHours += empEvent.ShiftHours;
+                            }
+                        }
+                    }
+                    if (!isSet)
+                    {
+                        <td><input id="daysInputs-@inputCounter" class="inputsClass form-control" data-fulldate="@day.Date.ToString("MM/dd/yyyy")" style="width: 95%;" type="text" readonly /></td>
+                    }
+                    isSet = false;
+                    inputCounter++;
+                }
+
+                <td class="empTotHours" id="employeeTotalHours-@empCounter">@totalEmpHours</td>
+            </tr>
+            empCounter++;
+            totalEmpHours = 0;
+        }
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><span style="font-weight: 600;color:white">Final Hours</span></td>
+            <td id="totEmpHours">@totalOverallHours</td>
+        </tr>
+    </tbody>
+</table>
+
+@if (ViewBag.Schedule.ApprovedCode.Status == "PENDING")
+{
+    <div class="row">
+        <div class="col-md-8">
+            <button onclick="GetScheduleData()" class="btn btn-primary"><i class="fas fa-plus"></i> Update</button>
+        </div>
+        <div class="col-md-4">
+            <span style="float: right">
+                <button onclick="SetApprovedStatus(true)" class="btn btn-success"><i class="fas fa-check"></i> Approve</button>
+                <button onclick="SetApprovedStatus(false)" class="btn btn-danger"><i class="fas fa-times"></i> Deny</button>
+            </span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+            <button onclick="ReverseStatus()" class="btn btn-danger"><i class="fas fa-history"></i> Reverse Status</button>
+        </div>
+    </div>
+}
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="row">
+            <div class="col-md-12" style="text-align: center">
+                <h2 style="color:black" id="modalTitle">Create/Update Shift</h2>
+                <hr style="width:75%" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" align="center">
+                <label style="color: black">Start Time</label>
+                <input id="startTimeHours" class="form-control hoursInputs" type="time" />
+                <br />
+                <label style="color: black">End Time</label>
+                <input id="endTimeHours" class="form-control hoursInputs" type="time" />
+                <br />
+                <label style="color: black">Total Hours</label>
+                <input id="totHoursForShift" class="form-control" type="number" readonly />
+                <br />
+                <label style="color: black">Shift Time</label>
+                <input id="viewShiftTime" class="form-control" type="text" readonly />
+                <br />
+                @if (ViewBag.Schedule.ApprovedCode.Status == "PENDING")
+                {
+                    <button id="addShiftBtn" style="width:47%" class="btn btn-success">Submit</button>
+                }
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+        // Globals
+        var clickedOnInput;
+
+        // Document On Ready
+        $(document).ready(function () {
+            const hourLabels = document.querySelectorAll('[id^=daysInputs]');
+            const hoursPickers = document.querySelectorAll('.hoursInputs');
+
+            @if (ViewBag.Schedule.ApprovedCode.Status != "PENDING")
+            {
+                <text>
+                for (let i = 0; i < hourLabels.length; i++) {
+                    hourLabels[i].readOnly = true;
+                }
+                for (let i = 0; i < hoursPickers.length; i++) {
+                    hoursPickers[i].readOnly = true;
+            }
+                $("#modalTitle").html("View Schedule");
+                </text>
+            }
+        });
+
+        // JQuery Triggers
+        $('.inputsClass').on('click',
+            function () {
+                clickedOnInput = $(this);
+
+                setViewModalInfo();
+                const modal = document.getElementById('myModal');
+                const span = document.getElementsByClassName("close")[0];
+
+                modal.style.display = "block";
+                span.onclick = function () {
+                    modal.style.display = "none";
+                }
+                window.onclick = function (event) {
+                    if (event.target === modal) {
+                        modal.style.display = "none";
+                    }
+                }
+
+            });
+
+        // Submit But Trigger for adding/update a shift
+        $('#addShiftBtn').on('click',
+            function () {
+                const inputDate = clickedOnInput[0].getAttribute('data-fulldate');
+                const startTime = document.getElementById('startTimeHours').value;
+                const endTime = document.getElementById('endTimeHours').value;
+                const timeHourStart = new Date(inputDate + ' ' + startTime);
+                const timeHourEnd = new Date(inputDate + ' ' + endTime);
+
+                //Format Strings for DB yyyy-mm-dd hh:mm:ss
+                const formattedStartDate =
+                    `${timeHourStart.getFullYear()}-${(timeHourStart.getMonth() + 1)}-${timeHourStart.getDate()} ${timeHourStart.getHours()}:${timeHourStart.getMinutes()}:${timeHourStart.getSeconds()}`;
+                const formattedEndDate =
+                    `${timeHourEnd.getFullYear()}-${(timeHourEnd.getMonth() + 1)}-${timeHourEnd.getDate()} ${timeHourEnd.getHours()}:${timeHourEnd.getMinutes()}:${timeHourEnd.getSeconds()}`;
+
+                // Set Start Date and End Date Attr for times and Hours
+                clickedOnInput[0].setAttribute('data-startTime', formattedStartDate);
+                clickedOnInput[0].setAttribute('data-endTime', formattedEndDate);
+
+                // Total Number of Hours Of Shift
+                const totHours = Math.abs(timeHourStart - timeHourEnd) / 36e5;
+
+                // Build String Shift Start 
+                const startHour = timeHourStart.getHours() > 12 ? timeHourStart.getHours() - 12 : timeHourStart.getHours();
+                const startMin = timeHourStart.getMinutes() < 10 ? '0' + timeHourStart.getMinutes() : timeHourStart.getMinutes();
+                const startMeridiem = timeHourStart.getHours() > 12 ? "PM" : "AM";
+
+                // Build String Shift End 
+                const endHour = timeHourEnd.getHours() > 12 ? timeHourEnd.getHours() - 12 : timeHourEnd.getHours();
+                const endMin = timeHourEnd.getMinutes() < 10 ? '0' + timeHourEnd.getMinutes() : timeHourEnd.getMinutes()
+                const endMeridiem = timeHourEnd.getHours() > 12 ? "PM" : "AM";
+
+                // Format Schedule String
+                const shiftStartString = `${startHour}:${startMin} ${startMeridiem}`;
+                const shiftEndString = `${endHour}:${endMin} ${endMeridiem}`;
+
+                // Build Final Schedule String that is View in Input Box
+                const finalShiftString = shiftStartString + ' - ' + shiftEndString;
+                $('#viewShiftTime').val(finalShiftString);
+
+                // Set Attr for Total Shift Hours
+                clickedOnInput[0].setAttribute('data-totalhours', totHours);
+
+                // Set Value of clicked input to hours value
+                clickedOnInput[0].value = finalShiftString;
+
+
+                $(".inputsClass").trigger('change');
+                document.getElementById('myModal').style.display = "none";
+            });
+
+        // When A value in an Input Changes Trigger this
+        $('.inputsClass').on('change',
+            function() {
+                const dayInputs = document.querySelectorAll('[id^=daysInputs]');
+                const days = 6;
+                let counter = 0;
+                let count = 0;
+                let totEmpHours = 0;
+
+                for (let employee = 0; employee < '@ViewBag.Employees.Count'; employee++) {
+                    while (count <= days) {
+                        if (dayInputs[counter].value !== "") {
+                            const hours = dayInputs[counter].getAttribute('data-totalhours');
+                            totEmpHours += parseFloat(hours);
+                            document.getElementById(`employeeTotalHours-${employee}`).innerHTML =
+                                parseFloat(totEmpHours.toFixed(2));
+                        }
+                        counter++;
+                        count++;
+                    }
+
+                    totEmpHours = 0;
+                    count = 0;
+                }
+            });
+
+        // Update Total Hours
+        $('.empTotHours').bind('DOMSubtreeModified',
+            function () {
+                const hourLabels = document.querySelectorAll('[id^=employeeTotalHours]');
+                let totalHours = 0;
+                for (let i = 0; i < hourLabels.length; i++) {
+                    const hours = hourLabels[i].innerHTML;
+                    totalHours += parseFloat(hours);
+                }
+                document.getElementById('totEmpHours').innerHTML = parseFloat(totalHours.toFixed(2));
+            });
+
+        // Update Total Hours
+        $('.hoursInputs').on('change',
+            function () {
+                const startHour = document.getElementById('startTimeHours').value;
+                const endHour = document.getElementById('endTimeHours').value;
+                const timeHourStart = new Date('2011-12-02' + ' ' + startHour);
+                const timeHourEnd = new Date('2011-12-02' + ' ' + endHour);
+                const totHours = Math.abs(timeHourStart - timeHourEnd) / 36e5;
+                document.getElementById('totHoursForShift').value = parseFloat(totHours.toFixed(2));
+            });
+
+        // Populate Modal with information from a preexisting employee event
+        function setViewModalInfo() {
+            let startTime = clickedOnInput[0].getAttribute('data-starttime');
+            let endTime = clickedOnInput[0].getAttribute('data-endtime');
+            let shiftHours = clickedOnInput[0].getAttribute('data-totalhours');
+
+            startTime = new Date(startTime);
+            endTime = new Date(endTime);
+
+            const startTimeSeconds = startTime.getSeconds() < 10 ? '0' + startTime.getSeconds() : startTime.getSeconds();
+            const endTimeSeconds = endTime.getSeconds() < 10 ? '0' + endTime.getSeconds() : endTime.getSeconds();
+
+            const startTimeMin = startTime.getMinutes() < 10 ? '0' + startTime.getMinutes() : startTime.getMinutes();
+            const endTimeMin = endTime.getMinutes() < 10 ? '0' + endTime.getMinutes() : endTime.getMinutes();
+
+            startTime = `${startTime.getHours()}:${startTimeMin}:${startTimeSeconds}`;
+            endTime = `${endTime.getHours()}:${endTimeMin}:${endTimeSeconds}`;
+
+            // If Viewing a Shift Set Start/End Time . Set Hours/Shift Time
+            $('#totHoursForShift').val(parseFloat(shiftHours).toFixed(2));
+            $('#startTimeHours').val(startTime);
+            $('#endTimeHours').val(endTime);
+            $('#viewShiftTime').val(clickedOnInput.val());
+        }
+
+        // Javascript Functions && Calls
+        function SetApprovedStatus(approvedStatus) {
+            location.href = approvedStatus ? "@Url.Action("SetApprovedStatus", "Admin", new {id=ViewBag.Schedule.ID, approvedStatus = true})" : "@Url.Action("SetApprovedStatus", "Admin",new { id = ViewBag.Schedule.ID, approvedStatus = false})";
+        }
+
+        function ReverseStatus() {
+            location.href =
+                "@Url.Action("ReverseStatus", "Admin", new {id=ViewBag.Schedule.ID})";
+        }
+
+        //Ajax Call To /Admin/AddSchedule
+        function GetScheduleData() {
+            let counter = 0;
+            let index = 0;
+            const schedulesInputs = [];
+            const days = 6;
+            const totEmpHours = document.getElementById('totEmpHours');
+            const storeNumber = document.getElementById('storeNumber');
+            const weekOfDate = document.getElementById('datepicker');
+            const dayInputs = document.querySelectorAll('[id^=daysInputs]');
+
+            for (let employee = 0; employee < '@ViewBag.Employees.Count'; employee++) {
+                while (counter <= days) {
+                    const empId = document.getElementById(`employeeId-${employee}`);
+                    const totHours = document.getElementById(`employeeTotalHours-${employee}`);
+
+                    if (dayInputs[index].value !== "") {
+                        schedulesInputs.push({
+                            "ShiftStartTime":
+                                dayInputs[index]
+                                    .getAttribute(
+                                        "data-startTime"),
+                            "ShiftEndTime":
+                                dayInputs[index]
+                                    .getAttribute(
+                                        "data-endTime"),
+                            "ShiftHours":
+                                dayInputs[index]
+                                    .getAttribute(
+                                        "data-totalhours"),
+                            "ThemeColor": "orange",
+                            "EmployeeID": parseInt(empId.innerHTML),
+                            "ScheduleID": null,
+                            "ApprovedStatusID": 2
+                        });
+                    }
+                    counter++;
+                    index++;
+                }
+                counter = 0;
+            }
+
+            
+            SendSchedule(schedulesInputs, totEmpHours, weekOfDate, storeNumber);
+        }
+
+        // Send Schedule to AJAX Call
+        function SendSchedule(schedulesInputs, totEmpHours, weekOfDate, storeNumber) {
+            
+            let isValid = false;
+
+            for (let i = 0; i < schedulesInputs.length; i++) {
+                if (schedulesInputs[i].ShiftStartTime === "") {
+                    isValid = false;
+                } else {
+                    isValid = true;
+                    break;
+                }
+            }
+            
+            if (isValid) {
+                $.ajax({
+                    url: "@Url.Action("UpdateSchedule", "Admin")",
+                    data: {
+                        tableData: schedulesInputs, // This Is For EmployeeEvents Table
+                        totalEmpHours: totEmpHours.innerHTML, // This Is For Schedule Table
+                        weekOfDate: weekOfDate.value, // This Is For Schedule Table
+                        storeNumber: storeNumber.value, // This Is For Schedule Table
+                        scheduleId: @ViewBag.Schedule.ID
+                    },
+                    type: "POST",
+                    dataType: "JSON",
+                    error: function(err) {
+                        location.href = "@Url.Action("Index", "Admin")";
+                    },
+                    success: function(returnedData) {
+                        location.href = "@Url.Action("Index", "Admin")";
+                    }
+                });
+            } else {
+                Swal.fire({
+                    type: 'warning',
+                    title: 'Schedule Not Sent',
+                    text: 'Please make sure at least one employee has been scheduled.'
+                });
+            }
+
+        }
+
+    </script>
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="ef2f6ec8bacc4c1b8c2f22ad09dc553a" Name="Diagram1">
+        <EntityTypeShape EntityType="ScheduleBuilderModel.ApprovedCode" Width="1.5" PointX="8.375" PointY="2.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ScheduleBuilderModel.Schedule" Width="1.5" PointX="3.75" PointY="5.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ScheduleBuilderModel.User" Width="1.5" PointX="3" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ScheduleBuilderModel.UserRole" Width="1.5" PointX="0.75" PointY="3.25" IsExpanded="true" />
+        <AssociationConnector Association="ScheduleBuilderModel.ScheduleApprovedStatus" ManuallyRouted="false" />
+        <AssociationConnector Association="ScheduleBuilderModel.User_Has_UserRole" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="ScheduleBuilderModel.EmployeeEvent" Width="1.5" PointX="5.875" PointY="2.375" />
+        <AssociationConnector Association="ScheduleBuilderModel.Schedule_Has_ApprovedStatus" />
+        <AssociationConnector Association="ScheduleBuilderModel.Schedule_Has_Employee" />
+        <AssociationConnector Association="ScheduleBuilderModel.Schedule_Has_ScheduleID" />
+        <EntityTypeShape EntityType="ScheduleBuilderModel.AcceptCode" Width="1.5" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="ScheduleBuilderModel.EmployeeTrade" Width="1.5" PointX="10.625" PointY="3.125" />
+        <AssociationConnector Association="ScheduleBuilderModel.EmployeeTrade_To_AcceptStatus" />
+        <AssociationConnector Association="ScheduleBuilderModel.EmployeeTrade_To_ApprovedStatus" />
+        <AssociationConnector Association="ScheduleBuilderModel.Trade_Has_Event" />
+        <AssociationConnector Association="ScheduleBuilderModel.EmployeeTrade_To_User" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,83 @@
+﻿<style scoped>
+    h1, h2, h3, h4, h5, h6 
+    {
+        color:white
+    }
+    .fc-today {
+        background: lightgray !important;
+        border: none !important;
+        border-top: 1px solid #ddd !important;
+        font-weight: bold;
+    }
+    .fc-center h2 {
+        color: black
+    }
+
+    
+
+</style>
+    
+
+@{
+    ViewBag.Title = "Calendar";
+}
+
+
+<div style="margin-bottom:20px">
+    <h3>View Schedule As: </h3>@Html.DropDownList("viewType", new SelectList(ViewBag.ViewTypes, "Value", "Text",ViewBag.ViewTypeID), new { @class = "form-control" })
+</div>
+
+<div id="calendar" style="border-color:black;cursor: pointer;background-color:white;border-radius:5px;padding:15px"></div>
+
+
+@section scripts
+{
+    <script>
+
+        // ON LOAD
+        $(() => {
+            generateCalendar();
+        });
+
+        // Build the Calendar with Events
+        function generateCalendar() {
+            $('#calendar').fullCalendar('destroy');
+            $('#calendar').fullCalendar({
+                contentHeight: 900,
+                defaultDate: new Date(),
+                timeFormat: 'h(:mm)a',
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,basicWeek,basicDay,agenda'
+                },
+                eventColor: '#378006',
+                eventLimit: 8,
+                events: @Html.Raw(ViewBag.EmployeeEvents),
+                eventClick: function(event, jsEvt, view) {
+                    Swal.fire({
+                        title: "Date: " + event.start.toString().substring(0, 10),
+                        text: `Employee Name: ${event.userName}`,
+                        input: 'text',
+                        inputValue: `${event.title}`,
+                        inputAttributes: {
+                            readonly: true,
+                            style:"backgroundColor:green"
+                        },
+                        imageWidth: 400,
+                        imageHeight: 200,
+                        animation: false
+                    });
+                }
+            });
+        }
+
+        // When User wants to change what they see on the calendar
+        $("select#viewType").change(function() {
+            var viewTypeID = $('select#viewType').val();
+            location.href = "/Home/Index?ViewTypeID=" + viewTypeID;
+        });
+
+    </script>
+
+}

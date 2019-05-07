@@ -1,0 +1,114 @@
+﻿@using ScheduleBuilderApp.Classes
+@functions {
+    enum UserRole
+    {
+        Sales = 1,
+        Manager = 99,
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Schedule Builder</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" />
+    <link href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/b-1.5.4/b-flash-1.5.4/b-html5-1.5.4/datatables.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css" />
+    <link href="~/Content/fullcalendar.min.css" rel="stylesheet" />
+    <link href="~/Content/fullcalendar.print.css" rel="stylesheet" media="print" />
+</head>
+<body style="background-color:#2b5763">
+    <nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-dark">
+
+        <a class="navbar-brand" href="@Url.Action("Index", "Home")">Schedule Builder</a>
+
+        @if (UserSession.User != null)
+        {
+            <!-- Toggler/collapsibe Button -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navbar links -->
+            <div class="collapse navbar-collapse justify-content-between" id="collapsibleNavbar">
+
+                <ul class="navbar-nav">
+                    <li id="bhomeActive" class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Home")">Home</a>
+                    </li>
+                    <li id="bhomeActive" class="nav-item">
+                        <a class="nav-link" href="@Url.Action("EmployeeTrades", "Home")">Trades</a>
+                    </li>
+                    @if (UserSession.User.UserRoleID == (int)UserRole.Manager)
+                    {
+                        <li id="bhomeActive" class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Admin")">Schedules</a>
+                        </li>
+                        <li id="bhomeActive" class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Users", "Admin")">Users</a>
+                        </li>
+                        <li id="bhomeActive" class="nav-item">
+                            <a class="nav-link" href="@Url.Action("TradeAlerts", "Admin")">Trade Alerts</a>
+                        </li>
+                     }
+
+                </ul>
+
+                <ul class="navbar-nav" style="margin-right:8%">
+
+                    <li id="accountActive" class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @UserSession.User.FirstName
+                        </a>
+                        <div class="dropdown-menu right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="@Url.Action("ChangePassword", "Account")">Change Password</a>
+                            <a class="dropdown-item" href="@Url.Action("Logout", "Login")">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+        }
+
+    </nav>
+
+    <div class="container body-content" style="padding-top:15px;">
+        @RenderBody()
+    </div>
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+    <script src='http://fullcalendar.io/js/fullcalendar-2.1.1/lib/moment.min.js'></script>
+    <script src='http://fullcalendar.io/js/fullcalendar-2.1.1/lib/jquery.min.js'></script>
+    <script src='http://fullcalendar.io/js/fullcalendar-2.1.1/fullcalendar.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.33.1/sweetalert2.all.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+    <!-- datatable export buttons -->
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/buttons.flash.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.4.1/js/buttons.print.min.js"></script>
+    @RenderSection("scripts", required: false)
+
+
+
+</body>
+</html>

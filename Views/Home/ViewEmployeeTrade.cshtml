@@ -1,0 +1,65 @@
+﻿@using ScheduleBuilderApp.Classes
+<style>
+    h1, h2, h3, h4, h5, h6 {
+        color: white;
+    }
+
+    .swal2-overflow {
+        overflow-x: visible;
+        overflow-y: visible;
+    }
+    @functions {
+    enum AcceptStatus
+    {
+        OPEN = 1,
+        PENDING = 2,
+        ACCEPETED = 3,
+        DENIED = 4
+    }
+}
+</style>
+@{
+    ViewBag.Title = "Employee Trades";
+}
+
+<h2>Employee Trades</h2>
+<br />
+@using (Html.BeginForm("RequestEmployeeTrade", "Home"))
+{
+<div class="form-group" style="background-color: white; padding: 25px;border-radius: 6px">
+    <input type="hidden" name="ID" value="@ViewBag.EmployeeTrade.ID" />
+    <input type="hidden" name="EventID" value="@ViewBag.EmployeeTrade.EventID" />
+    <input type="hidden" name="SwapUserID" value="@UserSession.User.ID" />
+    <div class="row">
+        <div class="col-md-4">
+            <label for="ShiftTime">Shift Time</label>
+            <input type="text" value="@ViewBag.EmployeeTrade.EmployeeEvent.ShiftStartTime.ToString("MM/dd/yyyy h:mm tt") - @ViewBag.EmployeeTrade.EmployeeEvent.ShiftEndTime.ToString("h:mm tt")" readonly class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="Position">Position</label>
+            <input id="Position" name="Position" type="text" readonly value="@ViewBag.EmployeeTrade.Position" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="Position">Employee</label>
+            <input id="Position" type="text" readonly value="@ViewBag.EmployeeTrade.User.FirstName @ViewBag.EmployeeTrade.User.LastName" name="Position" class="form-control" />
+        </div>
+    </div>
+    <br />
+    @if (ViewBag.EmployeeTrade.AcceptStatusID == (int)AcceptStatus.OPEN)
+    {
+        <button type="submit" class="btn btn-success">Accept</button>
+    }
+
+</div>
+
+}
+
+
+@section scripts
+{
+    <script>
+
+
+
+    </script>
+}
